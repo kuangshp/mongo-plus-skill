@@ -1,0 +1,4 @@
+interface:
+  display_name: "mongo-plus 开发指南"
+  short_description: "mongo-plus 的 Schema 生成、Repository 复用与业务分层规范"
+  default_prompt: "使用 $mongo-plus-skill 独立完成 mongo-plus 接口开发，核对实际版本，遵循 Schema 生成、连接初始化、Repository 复用、业务分层及 Session 事务规范，无需其他技能。"
