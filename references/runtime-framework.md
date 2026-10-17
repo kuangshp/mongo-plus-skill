@@ -19,7 +19,7 @@ import (
     "example.com/service/query/repository"
 )
 
-func OpenMongo(ctx context.Context, cfg mongoplus.Config) (*mongoplus.Database, error) {
+func OpenMongo(ctx context.Context, cfg mongoplus.Config) (*mongoplus.Database, error) { // 连接并核验数据库，注册生成集合规则及默认数据源。
     db, err := mongoplus.Connect(ctx, cfg)
     if err != nil {
         return nil, err
@@ -35,7 +35,7 @@ func OpenMongo(ctx context.Context, cfg mongoplus.Config) (*mongoplus.Database, 
     return db, nil
 }
 
-func CloseMongo(db *mongoplus.Database) error {
+func CloseMongo(db *mongoplus.Database) error { // 在服务退出时使用独立清理上下文关闭共享数据库连接。
     if db == nil {
         return nil
     }
@@ -68,7 +68,7 @@ import (
     "github.com/kuangshp/mongo-plus/validation"
 )
 
-func Init() (*validation.Validator, error) {
+func Init() (*validation.Validator, error) { // 为 Gin 现有校验引擎注册公共规则与错误翻译。
     if binding.Validator == nil {
         return nil, fmt.Errorf("Gin 参数校验器已禁用")
     }
@@ -90,9 +90,9 @@ func Init() (*validation.Validator, error) {
 package dto
 
 type CreateUserReq struct {
-    Username  string `json:"username" binding:"required,min=2" validate:"required,min=2"`
-    Status    *int64 `json:"status" binding:"required,oneof=0 1 2" validate:"required,oneof=0 1 2"`
-    StartTime string `json:"startTime" binding:"omitempty,dateTime" validate:"omitempty,dateTime"`
+    Username  string `json:"username" binding:"required,min=2" validate:"required,min=2"` // 用户名，至少两个字符。
+    Status    *int64 `json:"status" binding:"required,oneof=0 1 2" validate:"required,oneof=0 1 2"` // 用户状态：0、1 或 2；指针用于区分缺失和合法零值。
+    StartTime string `json:"startTime" binding:"omitempty,dateTime" validate:"omitempty,dateTime"` // 可选开始时间，格式为 2006-01-02 15:04:05。
 }
 ```
 
@@ -111,23 +111,25 @@ import (
     "example.com/service/query/repository"
 )
 
-type IUser interface { Create(*gin.Context) }
+type IUser interface {
+    Create(*gin.Context) // 校验请求并创建用户，返回接口响应。
+}
 
 type user struct {
-    userRepository repository.UserRepository
-    requestValidator *validation.Validator
+    userRepository repository.UserRepository // 用户数据访问接口，复用生成方法。
+    requestValidator *validation.Validator // 启动时配置的请求校验器及错误翻译实例。
 }
 
 var _ IUser = (*user)(nil)
 
-func NewUser(requestValidator *validation.Validator) IUser {
+func NewUser(requestValidator *validation.Validator) IUser { // 创建用户控制器并初始化用户仓储和校验依赖。
     return &user{
         userRepository: repository.NewUserRepository(),
         requestValidator: requestValidator,
     }
 }
 
-func (u *user) Create(ctx *gin.Context) {
+func (u *user) Create(ctx *gin.Context) { // 校验用户请求、调用仓储创建用户并返回约定响应。
     var req dto.CreateUserReq
     if err := ctx.ShouldBindJSON(&req); err != nil {
         ctx.JSON(http.StatusBadRequest, gin.H{"message": u.requestValidator.FirstMessage(err)})
@@ -160,13 +162,13 @@ func (u *user) Create(ctx *gin.Context) {
 syntax = "v1"
 
 type CreateUserReq {
-    Username string `json:"username" validate:"required,min=2"`
-    Status *int64 `json:"status" validate:"required,oneof=0 1 2"`
-    StartTime string `json:"startTime,optional" validate:"omitempty,dateTime"`
+    Username string `json:"username" validate:"required,min=2"` // 用户名，至少两个字符。
+    Status *int64 `json:"status" validate:"required,oneof=0 1 2"` // 状态：0、1 或 2，指针区分缺失与零值。
+    StartTime string `json:"startTime,optional" validate:"omitempty,dateTime"` // 可选开始时间，格式为 2006-01-02 15:04:05。
 }
 
 type CreateUserResp {
-    Id string `json:"id"`
+    Id string `json:"id"` // 用户 ID，默认 ObjectID 的十六进制字符串。
 }
 
 service service-api {
@@ -203,7 +205,7 @@ if validation.HasRules(&req) {
 构造函数字段示例已完整放在[生成流程](generator-workflow.md)，属于本包内容。CreateUser 的字段换成 `userRepository repository.UserRepository`，赋值为 `repository.NewUserRepository()`；Logger、ctx、svcCtx、Request、W 按该示例保留。业务方法中：
 
 ```go
-func (l *CreateUserLogic) CreateUser(req *types.CreateUserReq) (*types.CreateUserResp, error) {
+func (l *CreateUserLogic) CreateUser(req *types.CreateUserReq) (*types.CreateUserResp, error) { // 将已校验的请求映射为用户实体，保存后返回用户 ID。
     if req == nil || req.Status == nil {
         return nil, fmt.Errorf("缺少用户状态")
     }

@@ -72,16 +72,16 @@ nullable 会影响生成 Go 类型，按真实输出核对指针。ID 默认 obj
   "entity": "UserEntity",
   "collection": "users",
   "fields": [
-    {"name": "username", "type": "string", "required": true, "rules": {"minLength": 2}},
-    {"name": "status", "type": "int64", "rules": {"enum": [0, 1, 2]}},
-    {"name": "balance", "type": "decimal128"},
-    {"name": "tags", "type": "[]string"},
-    {"name": "profile", "type": "object", "nullable": true, "fields": [
-      {"name": "city", "type": "string"}
+    {"name": "username", "type": "string", "comment": "用户名", "required": true, "rules": {"minLength": 2}},
+    {"name": "status", "type": "int64", "comment": "状态：0、1 或 2", "rules": {"enum": [0, 1, 2]}},
+    {"name": "balance", "type": "decimal128", "comment": "账户余额，使用精确十进制"},
+    {"name": "tags", "type": "[]string", "comment": "用户标签"},
+    {"name": "profile", "type": "object", "comment": "用户资料", "nullable": true, "fields": [
+      {"name": "city", "type": "string", "comment": "所在城市"}
     ]},
-    {"name": "lines", "type": "[]object", "fields": [
-      {"name": "sku_id", "type": "objectId"},
-      {"name": "quantity", "type": "int64"}
+    {"name": "lines", "type": "[]object", "comment": "明细列表", "fields": [
+      {"name": "sku_id", "type": "objectId", "comment": "商品规格 ID"},
+      {"name": "quantity", "type": "int64", "comment": "数量"}
     ]}
   ],
   "indexes": [

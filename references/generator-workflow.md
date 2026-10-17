@@ -14,8 +14,8 @@
 {
   "comment": "用户",
   "fields": [
-    {"name": "username", "type": "string", "required": true, "unique": true},
-    {"name": "status", "type": "int64"}
+    {"name": "username", "type": "string", "comment": "用户名", "required": true, "unique": true},
+    {"name": "status", "type": "int64", "comment": "状态：0、1 或 2"}
   ]
 }
 ```
@@ -34,7 +34,7 @@ import (
     mongoplus "github.com/kuangshp/mongo-plus"
 )
 
-func main() {
+func main() { // 读取显式指定的生成配置，按任务完成结构同步并生成数据层基础代码。
     if len(os.Args) != 2 {
         log.Fatal("用法: go run generator.go <生成配置文件>")
     }
@@ -92,16 +92,16 @@ Schema 修改后 DTO/VO、已有扩展与 HTTP 文件不一定更新，应检查
 
 ```go
 type ListOrdersLogic struct {
-    logx.Logger
-    ctx     context.Context
-    svcCtx  *svc.ServiceContext
-    Request *http.Request
-    W       http.ResponseWriter
+    logx.Logger // 当前请求的上下文日志记录器。
+    ctx     context.Context // 当前请求上下文，保留取消信号与身份信息。
+    svcCtx  *svc.ServiceContext // 服务共享配置及已初始化资源。
+    Request *http.Request // 当前 HTTP 请求及请求元数据。
+    W       http.ResponseWriter // 当前 HTTP 响应输出。
 
-    purchaseOrderRepository repository.PurchaseOrderRepository
+    purchaseOrderRepository repository.PurchaseOrderRepository // 采购订单数据访问接口，复用生成方法。
 }
 
-func NewListOrdersLogic(ctx context.Context, svcCtx *svc.ServiceContext, request *http.Request, w http.ResponseWriter) *ListOrdersLogic {
+func NewListOrdersLogic(ctx context.Context, svcCtx *svc.ServiceContext, request *http.Request, w http.ResponseWriter) *ListOrdersLogic { // 创建订单列表逻辑并初始化日志、请求上下文及订单仓储。
     return &ListOrdersLogic{
         Logger:  logx.WithContext(ctx),
         ctx:     ctx,

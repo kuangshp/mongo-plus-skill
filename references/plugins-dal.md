@@ -27,7 +27,7 @@ package bootstrap
 
 import mongoplus "github.com/kuangshp/mongo-plus"
 
-func ConfigureTenant(db *mongoplus.Database) error {
+func ConfigureTenant(db *mongoplus.Database) error { // 为指定数据源注册 int64 租户字段与上下文取值规则。
     return mongoplus.RegisterTenant(db, mongoplus.TenantConfig[int64]{
         TenantField: "tenant_id",
         GetTenantID: mongoplus.TenantIDFromCtx[int64],
